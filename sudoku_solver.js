@@ -21,7 +21,7 @@ function board () {
     this.squares_left = 81;
 
     // stores in an array the current numbers on the board
-    this.current_board = [
+    this.board = [
         0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,
@@ -96,10 +96,21 @@ function board () {
     this.add_number = function (num, row, col) {
         var pos = col + row * 9;
         var nonet = this.nonet_at(row, col);
-        if (this.current_board[pos] == 0) {
-            
+        if (this.board[pos] == 0) {
+            this.board[pos] = num;
+            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+                --this.squares_left;
+                return true;
+            }
+            this.given_board[pos] = 0; // invalid number
+            return true;
         } else if (this.given_board[pos] == 0) { //replace an added number
-
+            var temp = this.board[pos];
+            this.baord[pos] = num;
+            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+                return true;
+            }
+            this.given_board[pos] = temp;
         }
         return false;
     }
@@ -113,7 +124,7 @@ function board () {
         }
         this.board[pos] = 0;
         --this.squares_left;
-        return 
+        return true;
     }
 
     // method to determine if the given_board is a solvable puzzle
@@ -182,7 +193,7 @@ function board () {
 
     // method to find the nonet given col and row
     // returns the an integer from 1-9
-    this.nonet_at(row, col) {
+    this.nonet_at = function (row, col) {
         if (row < 3) {
             if (col < 3) {
                 return 0;
