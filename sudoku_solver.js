@@ -61,7 +61,7 @@ function board () {
         var nonet = this.nonet_at(row, col);
         if (this.given_board[pos] == 0) { // available space in the original board
             this.given_board[pos] = num;
-            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+            if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 --this.squares_left;
                 return true;
             }
@@ -69,7 +69,7 @@ function board () {
         } else {
             var temp = this.given_board[pos];
             this.given_board[pos] = num;
-            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+            if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 return true;
             }
             this.given_board[pos] = temp;
@@ -81,10 +81,10 @@ function board () {
     // returns true if a starting number was removed, or false if there was no number there
     this.remove_starting_number = function (row, col) {
         var pos = col + row * 9;
-        if (this.board[pos] == 0) {
+        if (this.given_board[pos] == 0) {
             return false;
         }
-        this.board[pos] = 0;
+        this.given_board[pos] = 0;
         ++this.squares_left;
         return true;
     }   
@@ -98,19 +98,19 @@ function board () {
         var nonet = this.nonet_at(row, col);
         if (this.board[pos] == 0) {
             this.board[pos] = num;
-            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+            if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 --this.squares_left;
                 return true;
             }
-            this.given_board[pos] = 0; // invalid number
+            this.board[pos] = 0; // invalid number
             return true;
         } else if (this.given_board[pos] == 0) { //replace an added number
             var temp = this.board[pos];
             this.baord[pos] = num;
-            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+            if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 return true;
             }
-            this.given_board[pos] = temp;
+            this.board[pos] = temp;
         }
         return false;
     }
@@ -139,7 +139,7 @@ function board () {
         for (var i = 0; i < 9; ++i) {
             a[i] = this.board[row * 9 + i];
         }
-        a = selctionsort(a, 9);
+        a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
             if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number besides 0
                 return false;
@@ -156,7 +156,7 @@ function board () {
         for (var i = 0; i < 9; ++i) {
             a[i] = this.board[i * 9 + col];
         }
-        a = selctionsort(a, 9);
+        a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
             if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number
                 return false;
@@ -188,7 +188,10 @@ function board () {
 
     // method to check if the puzzle is solved
     this.check_win = function() {
-
+        if (this.squares_left == 0) {
+            return true;
+        }
+        return false;
     }
 
     // method to find the nonet given col and row
@@ -238,5 +241,3 @@ function selectionsort (a, len) {
     }
     return a;
 }
-
-
