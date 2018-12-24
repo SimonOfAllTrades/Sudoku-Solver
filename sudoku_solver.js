@@ -59,12 +59,20 @@ function board () {
     this.add_starting_number = function (num, row, col) {
         var pos = col + row * 9;
         var nonet = this.nonet_at(row, col);
-        if (this.given_board[pos] == 0) { //available space
+        if (this.given_board[pos] == 0) { // available space in the original board
             this.given_board[pos] = num;
-            if (this.check_row(row) && this.check_column(column) && this.check_nonet(nonet)) {
+            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+                --this.squares_left;
                 return true;
-            } 
-            this.given_board[pos] = 0;
+            }
+            this.given_board[pos] = 0; // invalid number
+        } else {
+            var temp = this.given_board[pos];
+            this.given_board[pos] = num;
+            if (check_row(row) && check_column(col) && check_nonet(nonet)) {
+                return true;
+            }
+            this.given_board[pos] = temp;
         }
         return false;
     }
@@ -72,8 +80,14 @@ function board () {
     // method to remove a starting number at row and col
     // returns true if a starting number was removed, or false if there was no number there
     this.remove_starting_number = function (row, col) {
-
-    }
+        var pos = col + row * 9;
+        if (this.board[pos] == 0) {
+            return false;
+        }
+        this.board[pos] = 0;
+        ++this.squares_left;
+        return true;
+    }   
 
     // method to add a num at the pos of col and row to cuurent_board
     // num is between 1-9
@@ -92,33 +106,73 @@ function board () {
 
     // method to remove the number at loc from current board, if there is no number there, nothing is changed
     // returns true if successfuly removed, fasle if there was no number there or there was a starting number
-    this.remove_number = function (loc) {
-
+    this.remove_number = function (row, col) {
+        var pos = col + row * 9;
+        if (this.board[pos] == 0 || this.given_board[pos] != 0) {
+            return false;
+        }
+        this.board[pos] = 0;
+        --this.squares_left;
+        return 
     }
 
     // method to determine if the given_board is a solvable puzzle
-    this.check_solveable = function () {
-
-    }
-
-    // method that determines if the added number is valid
-    this.valid_move = function () {
+    this.check_solveable = function (row, col, nonet) {
 
     }
 
     // method to check the items in a row of an array to see if they are valid
+    // returns true if the row is valid and all the numbers from 1-9 appear at most once
     this.check_row = function (row) {
-
+        var a = [];
+        for (var i = 0; i < 9; ++i) {
+            a[i] = this.board[row * 9 + i];
+        }
+        a = selctionsort(a, 9);
+        for (var i = 0; i < 8; ++i) {
+            if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number besides 0
+                return false;
+            }
+        }
+        // a has unique numbers other than 0
+        return true;
     }
 
     // method to check the items in a column of an array to see if they are valid
-    this.check_column = function (column) {
-
+    // returns true if the col is valid and all the numbers from 1-9 appear at most once
+    this.check_column = function (col) {
+        var a = [];
+        for (var i = 0; i < 9; ++i) {
+            a[i] = this.board[i * 9 + col];
+        }
+        a = selctionsort(a, 9);
+        for (var i = 0; i < 8; ++i) {
+            if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number
+                return false;
+            }
+        }
+        // a has unique numbers other than 0
+        return true;
     }
 
     // method to check the items in a nonet of an array to see if they are valid
     this.check_nonet = function (nonet) {
-
+        var start = nonet % 3 * 3 + (9 * 3 * Math.floor(nonet / 3));
+        var a = [];
+        for (var i = 0, k = 0; i < 3; ++i) {
+            for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
+                a[i * 3 + k] = this.board[j];
+            }
+            k = 0;
+        }
+        a = selectionsort(a, 9);
+        for (var i = 0; i < 8; ++i) {
+            if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number
+                return false;
+            }
+        }
+        // a has unique numbers other than 0
+        return true;
     }
 
     // method to check if the puzzle is solved
@@ -131,32 +185,47 @@ function board () {
     this.nonet_at(row, col) {
         if (row < 3) {
             if (col < 3) {
-                return 1;
+                return 0;
             } else if (col < 6) {
-                return 2;
+                return 1;
             } else {
-                return 3;
+                return 2;
             }
         } else if (row < 6) {
             if (col < 3) {
-                return 4;
+                return 3;
             } else if (col < 6) {
-                return 5;
+                return 4;
             } else {
-                return 6;
+                return 5;
             }
         } else {
             if (col < 3) {
-                return 7;
+                return 6;
             } else if (col < 6) {
-                return 8;
+                return 7;
             } else {
-                return 9;
+                return 8;
             }
         }
     }
 
 }
 
+
+// selectionsort sorts len items in a in ascending order
+// returns array of sorted numbers
+function selectionsort (a, len) {
+    for (var j = len - 1; j > 0; --j) {
+        for (var i = 0; i < j; ++i) {
+            if (a[i] > a[i + 1]) {
+                var temp = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = temp;
+            }
+        }
+    }
+    return a;
+}
 
 
