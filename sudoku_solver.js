@@ -46,27 +46,52 @@ function board () {
         0,0,0,0,0,0,0,0,0
     ];
 
-    // method to create a new board
+    // method to create a new board and request the client to add and remove numbers
+    // returns void
     this.create_board = function () {
 
     }
 
-    // method to add a num at loc to cuurent_board
+    // method to add num at col and row to the initial numbers on the board
     // num is between 1-9
-    // loc is between 0-80
-    this.add_number = function (num, loc) {
-        if (this.current_board[loc] == 0) {
-            
-        } else if (this.given_board[loc] == 0) { //replace an added number
+    // row, col is between 0-8
+    // returns true if a number was successfully added, false if there was a number or there was a number in the same row, column or nonet
+    this.add_starting_number = function (num, row, col) {
+        var pos = col + row * 9;
+        var nonet = this.nonet_at(row, col);
+        if (this.given_board[pos] == 0) { //available space
+            this.given_board[pos] = num;
+            if (this.check_row(row) && this.check_column(column) && this.check_nonet(nonet)) {
+                return true;
+            } 
+            this.given_board[pos] = 0;
+        }
+        return false;
+    }
 
-        } else { //trying to replace an initial number
+    // method to remove a starting number at row and col
+    // returns true if a starting number was removed, or false if there was no number there
+    this.remove_starting_number = function (row, col) {
+
+    }
+
+    // method to add a num at the pos of col and row to cuurent_board
+    // num is between 1-9
+    // row, col is between 0-8
+    // returns true if a number has been added or replaced, false if there was a starting number there
+    this.add_number = function (num, row, col) {
+        var pos = col + row * 9;
+        var nonet = this.nonet_at(row, col);
+        if (this.current_board[pos] == 0) {
+            
+        } else if (this.given_board[pos] == 0) { //replace an added number
 
         }
+        return false;
     }
 
     // method to remove the number at loc from current board, if there is no number there, nothing is changed
-    // during the create_baord method, if remove_number is used, it will alter given_board
-    // remove_number does not affect given_board once the board has been created
+    // returns true if successfuly removed, fasle if there was no number there or there was a starting number
     this.remove_number = function (loc) {
 
     }
@@ -76,18 +101,23 @@ function board () {
 
     }
 
-    // method to sum the items in a row of an array
-    this.sum_row = function (row) {
+    // method that determines if the added number is valid
+    this.valid_move = function () {
 
     }
 
-    // method to sum the items in a column of an array
-    this.sum_column = function (column) {
+    // method to check the items in a row of an array to see if they are valid
+    this.check_row = function (row) {
 
     }
 
-    // method to sum the items in a nonet of an array
-    this.sum_nonet = function (nonet) {
+    // method to check the items in a column of an array to see if they are valid
+    this.check_column = function (column) {
+
+    }
+
+    // method to check the items in a nonet of an array to see if they are valid
+    this.check_nonet = function (nonet) {
 
     }
 
@@ -96,6 +126,35 @@ function board () {
 
     }
 
+    // method to find the nonet given col and row
+    // returns the an integer from 1-9
+    this.nonet_at(row, col) {
+        if (row < 3) {
+            if (col < 3) {
+                return 1;
+            } else if (col < 6) {
+                return 2;
+            } else {
+                return 3;
+            }
+        } else if (row < 6) {
+            if (col < 3) {
+                return 4;
+            } else if (col < 6) {
+                return 5;
+            } else {
+                return 6;
+            }
+        } else {
+            if (col < 3) {
+                return 7;
+            } else if (col < 6) {
+                return 8;
+            } else {
+                return 9;
+            }
+        }
+    }
 
 }
 
