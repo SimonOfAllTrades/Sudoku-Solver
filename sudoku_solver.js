@@ -14,9 +14,6 @@
 
 
 function board () {
-    // determines if the board is solved 
-    this.solved = false;
-
     // determines how many unused pieces are left
     this.squares_left = 81;
 
@@ -240,4 +237,14 @@ function selectionsort (a, len) {
         }
     }
     return a;
+}
+
+
+// HTML relating sections
+var html = {
+    get click_square (pos) {
+        var row = Math.floor(pos / 9);
+        var col = pos % 9;
+        
+    }
 }
