@@ -43,6 +43,17 @@ function board () {
         0,0,0,0,0,0,0,0,0
     ];
 
+    // waiting for a number to be pressed when trying to add a number to the grid
+    this.waiting_for_num = false;
+
+    this.pressed_num;
+
+    this.pressed_pos;
+
+    this.pressed_row;
+
+    this.pressed_col;
+
     // method to create a new board and request the client to add and remove numbers
     // returns void
     this.create_board = function () {
@@ -100,10 +111,9 @@ function board () {
                 return true;
             }
             this.board[pos] = 0; // invalid number
-            return true;
         } else if (this.given_board[pos] == 0) { //replace an added number
             var temp = this.board[pos];
-            this.baord[pos] = num;
+            this.board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 return true;
             }
@@ -239,12 +249,27 @@ function selectionsort (a, len) {
     return a;
 }
 
+var new_board = new board();
+document.addEventListener("keydown", function(event) {
+    if (new_board.waiting_for_num) {
+        if (event.keyCode >= 49 && event.keyCode <= 57) {
+            new_board.pressed_num = event.keyCode - 48;
+            if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+            }
+            new_board.waiting_for_num = false;
+        }
+    }
+});
+
+
 
 // HTML relating sections
 var html = {
-    get click_square (pos) {
-        var row = Math.floor(pos / 9);
-        var col = pos % 9;
-        
+    click_square: function (pos) {
+        new_board.pressed_pos = pos;
+        new_board.pressed_row = Math.floor(pos / 9);
+        new_board.pressed_col = pos % 9;
+        new_board.waiting_for_num = true;
     }
 }
