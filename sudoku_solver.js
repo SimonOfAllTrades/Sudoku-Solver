@@ -277,5 +277,6 @@ var html = {
         new_board.pressed_row = Math.floor(pos / 9);
         new_board.pressed_col = pos % 9;
         new_board.waiting_for_num = true;
+        document.getElementById(pos).backgroundColor = "grey";
     }
 }
