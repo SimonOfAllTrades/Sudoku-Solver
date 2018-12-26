@@ -331,18 +331,30 @@ var html = {
     },
 
     change_state: function (state) {
-        for (var i = 0; i < 81; ++i) {
-            if (new_board.given_board[i] == 0) {
-                new_board.board[i] = 0;
-                document.getElementById(i).innerHTML = "";
+        if (state == 0) {
+            if (confirm("Are you sure you want to erase all non-starting numbers?")) {
+                new_board.adding_starting_num = true;
+                for (var i = 0; i < 81; ++i) {
+                    if (new_board.given_board[i] == 0) {
+                        new_board.board[i] = 0;
+                        document.getElementById(i).innerHTML = "";
+                    }
+                }
+                new_board.board = new_board.given_board.slice();
+            }
+            return;
+        } else if (state == 1) {
+            new_board.adding_starting_num = false;
+        } else if (state == 2) {
+            if (confirm("Are you sure you want to reset the entire baord?")) {
+                for (var i = 0; i < 81; ++i) {
+                    new_board.given_board[i] = 0;
+                    document.getElementById(i).innerHTML = "";
+                    document.getElementById(i).style.backgroundColor = "white";
+                }
+                new_board.board = new_board.given_board.slice();
             }
         }
-        if (state == 0) {
-            new_board.adding_starting_num = true;
-        } else {
-            new_board.adding_starting_num = false;
-        }
-        new_board.board = new_board.given_board.slice();
     }
 }
 

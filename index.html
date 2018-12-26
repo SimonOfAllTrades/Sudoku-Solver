@@ -7,6 +7,7 @@
                 border: 1px solid black;
                 text-align: center;
                 font-size: 35px;
+                cursor:hand;
             }
 
             #board {
@@ -20,21 +21,30 @@
             #navbar {
                 right: 5%;
                 top: 20%;
-                width: 20%;
+                width: 15%;
                 height: 60%;
-                border-radius: 10%;
+                border-radius: 20px;
                 background-color: #daf7a6;
                 position: absolute;
             }
 
-            #add_start, #add_reg {
+            #add_start, #add_reg, #reset {
                 width: 60%;
-                height: 25%;
+                height: 15%;
                 margin: 10%;
                 padding: 10%;
-                border-radius: 10%;
+                border-radius: 20px;
                 text-align: center;
                 background-color: #ffc300;
+                cursor:hand;
+                transition-timing-function: ease;
+                transition: 0.5s;
+            }
+
+            #add_start:hover, #add_reg:hover, #reset:hover {
+                margin: 5%;
+                width: 70%;
+                height: 20%;
             }
         </style>
         <script src = "sudoku_solver.js"></script>
@@ -48,6 +58,10 @@
     
                     <div id = "add_reg" onclick = "html.change_state(1)">
                         <h2>Manually solve the puzzle</h2>
+                    </div>
+
+                    <div id = "reset" onclick = "html.change_state(2)">
+                        <h2>Reset the board</h2>
                     </div>
                 </div>
             <div id = "board">
