@@ -292,21 +292,21 @@ document.addEventListener("keydown", function(event) {
                 new_board.pressed_num = event.keyCode - 48;
                 if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                    new_board.waiting_for_num = false;
                 }
-                new_board.waiting_for_num = false;
             } else if (event.keyCode >= 97 && event.keyCode <= 105) {
                 new_board.pressed_num = event.keyCode - 96;
                 if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                    new_board.waiting_for_num = false;
                 }
-                new_board.waiting_for_num = false;
             } else if (event.keyCode == 8 || event.keyCode == 48) {
                 new_board.pressed_num = 0;
                 if (new_board.remove_number(new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = "";
                     document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+                    new_board.waiting_for_num = false;
                 }
-                new_board.waiting_for_num = false;
             }
         }  
     }
@@ -316,14 +316,33 @@ document.addEventListener("keydown", function(event) {
 
 // HTML relating sections
 var html = {
+
     click_square: function (pos) {
-        if (!new_board.adding_starting_num || new_board.waiting_for_num) {
+        if (new_board.given_board[new_board.pressed_pos] == 0) {
             document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+        } else if (new_board.waiting_for_num) {
+            document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
         }
         new_board.pressed_pos = pos;
         new_board.pressed_row = Math.floor(pos / 9);
         new_board.pressed_col = pos % 9;
         new_board.waiting_for_num = true;
         document.getElementById(pos).style.backgroundColor = "#b2babb";
+    },
+
+    change_state: function (state) {
+        for (var i = 0; i < 81; ++i) {
+            if (new_board.given_board[i] == 0) {
+                new_board.board[i] = 0;
+                document.getElementById(i).innerHTML = "";
+            }
+        }
+        if (state == 0) {
+            new_board.adding_starting_num = true;
+        } else {
+            new_board.adding_starting_num = false;
+        }
+        new_board.board = new_board.given_board.slice();
     }
 }
+
