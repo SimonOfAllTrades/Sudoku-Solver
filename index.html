@@ -1,1 +1,129 @@
-<h1>Hello World</h1>
+<html>
+    <head>
+        <style>
+            .square {
+                height: 40px;
+                width: 40px;
+                border: 1px solid grey;
+                text-align: center;
+                font-size: 35px;
+            }
+
+            #board {
+                display: grid;
+                grid-template-columns: auto auto auto auto auto auto auto auto auto;
+                position: absolute;
+                left: 40%;
+                top: 20%;
+            }
+        </style>
+        <script src = "sudoku_solver.js"></script>
+    </head>
+    <body>
+        <div id = "mainpage">
+            <div id = "navbar">
+
+            </div>
+            <div id = "board">
+                <!-- row one -->
+                <div class = "square" id = "0" onclick = "html.click_square(0)"></div>
+                <div class = "square" id = "1" onclick = "html.click_square(1)"></div>
+                <div class = "square" id = "2" onclick = "html.click_square(2)"></div>
+                <div class = "square" id = "3" onclick = "html.click_square(3)"></div>
+                <div class = "square" id = "4" onclick = "html.click_square(4)"></div>
+                <div class = "square" id = "5" onclick = "html.click_square(5)"></div>
+                <div class = "square" id = "6" onclick = "html.click_square(6)"></div>
+                <div class = "square" id = "7" onclick = "html.click_square(7)"></div>
+                <div class = "square" id = "8" onclick = "html.click_square(8)"></div>
+                <!-- row two -->
+                <div class = "square" id = "9" onclick = "html.click_square(9)"></div>
+                <div class = "square" id = "10" onclick = "html.click_square(10)"></div>
+                <div class = "square" id = "11" onclick = "html.click_square(11)"></div>
+                <div class = "square" id = "12" onclick = "html.click_square(12)"></div>
+                <div class = "square" id = "13" onclick = "html.click_square(13)"></div>
+                <div class = "square" id = "14" onclick = "html.click_square(14)"></div>
+                <div class = "square" id = "15" onclick = "html.click_square(15)"></div>
+                <div class = "square" id = "16" onclick = "html.click_square(16)"></div>
+                <div class = "square" id = "17" onclick = "html.click_square(17)"></div>
+                
+                <!-- row three -->
+                <div class = "square" id = "18" onclick = "html.click_square(18)"></div>
+                <div class = "square" id = "19" onclick = "html.click_square(19)"></div>
+                <div class = "square" id = "20" onclick = "html.click_square(20)"></div>
+                <div class = "square" id = "21" onclick = "html.click_square(21)"></div>
+                <div class = "square" id = "22" onclick = "html.click_square(22)"></div>
+                <div class = "square" id = "23" onclick = "html.click_square(23)"></div>
+                <div class = "square" id = "24" onclick = "html.click_square(24)"></div>
+                <div class = "square" id = "25" onclick = "html.click_square(25)"></div>
+                <div class = "square" id = "26" onclick = "html.click_square(26)"></div>
+                
+                <!-- row four -->
+                <div class = "square" id = "27" onclick = "html.click_square(27)"></div>
+                <div class = "square" id = "28" onclick = "html.click_square(28)"></div>
+                <div class = "square" id = "29" onclick = "html.click_square(29)"></div>
+                <div class = "square" id = "30" onclick = "html.click_square(30)"></div>
+                <div class = "square" id = "31" onclick = "html.click_square(31)"></div>
+                <div class = "square" id = "32" onclick = "html.click_square(32)"></div>
+                <div class = "square" id = "33" onclick = "html.click_square(33)"></div>
+                <div class = "square" id = "34" onclick = "html.click_square(34)"></div>
+                <div class = "square" id = "35" onclick = "html.click_square(35)"></div>
+                
+                <!-- row five -->
+                <div class = "square" id = "36" onclick = "html.click_square(36)"></div>
+                <div class = "square" id = "37" onclick = "html.click_square(37)"></div>
+                <div class = "square" id = "38" onclick = "html.click_square(38)"></div>
+                <div class = "square" id = "39" onclick = "html.click_square(39)"></div>
+                <div class = "square" id = "40" onclick = "html.click_square(40)"></div>
+                <div class = "square" id = "41" onclick = "html.click_square(41)"></div>
+                <div class = "square" id = "42" onclick = "html.click_square(42)"></div>
+                <div class = "square" id = "43" onclick = "html.click_square(43)"></div>
+                <div class = "square" id = "44" onclick = "html.click_square(44)"></div>
+                
+                <!-- row six -->
+                <div class = "square" id = "45" onclick = "html.click_square(45)"></div>
+                <div class = "square" id = "46" onclick = "html.click_square(46)"></div>
+                <div class = "square" id = "47" onclick = "html.click_square(47)"></div>
+                <div class = "square" id = "48" onclick = "html.click_square(48)"></div>
+                <div class = "square" id = "49" onclick = "html.click_square(49)"></div>
+                <div class = "square" id = "50" onclick = "html.click_square(50)"></div>
+                <div class = "square" id = "51" onclick = "html.click_square(51)"></div>
+                <div class = "square" id = "52" onclick = "html.click_square(52)"></div>
+                <div class = "square" id = "53" onclick = "html.click_square(53)"></div>
+                
+                <!-- row seven -->
+                <div class = "square" id = "54" onclick = "html.click_square(54)"></div>
+                <div class = "square" id = "55" onclick = "html.click_square(55)"></div>
+                <div class = "square" id = "56" onclick = "html.click_square(56)"></div>
+                <div class = "square" id = "57" onclick = "html.click_square(57)"></div>
+                <div class = "square" id = "58" onclick = "html.click_square(58)"></div>
+                <div class = "square" id = "59" onclick = "html.click_square(59)"></div>
+                <div class = "square" id = "60" onclick = "html.click_square(60)"></div>
+                <div class = "square" id = "61" onclick = "html.click_square(61)"></div>
+                <div class = "square" id = "62" onclick = "html.click_square(62)"></div>
+                
+                <!-- row eight -->
+                <div class = "square" id = "63" onclick = "html.click_square(63)"></div>
+                <div class = "square" id = "64" onclick = "html.click_square(64)"></div>
+                <div class = "square" id = "65" onclick = "html.click_square(65)"></div>
+                <div class = "square" id = "66" onclick = "html.click_square(66)"></div>
+                <div class = "square" id = "67" onclick = "html.click_square(67)"></div>
+                <div class = "square" id = "68" onclick = "html.click_square(68)"></div>
+                <div class = "square" id = "69" onclick = "html.click_square(69)"></div>
+                <div class = "square" id = "70" onclick = "html.click_square(70)"></div>
+                <div class = "square" id = "71" onclick = "html.click_square(71)"></div>
+                
+                <!-- row nine -->
+                <div class = "square" id = "72" onclick = "html.click_square(72)"></div>
+                <div class = "square" id = "73" onclick = "html.click_square(73)"></div>
+                <div class = "square" id = "74" onclick = "html.click_square(74)"></div>
+                <div class = "square" id = "75" onclick = "html.click_square(75)"></div>
+                <div class = "square" id = "76" onclick = "html.click_square(76)"></div>
+                <div class = "square" id = "77" onclick = "html.click_square(77)"></div>
+                <div class = "square" id = "78" onclick = "html.click_square(78)"></div>
+                <div class = "square" id = "79" onclick = "html.click_square(79)"></div>
+                <div class = "square" id = "80" onclick = "html.click_square(80)"></div>
+                
+            </div>
+        </div>
+    </body>
+</html>
