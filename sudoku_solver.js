@@ -56,12 +56,6 @@ function board () {
 
     this.pressed_col;
 
-    // method to create a new board and request the client to add and remove numbers
-    // returns void
-    this.create_board = function () {
-
-    }
-
     // method to add num at col and row to the initial numbers on the board
     // num is between 1-9
     // row, col is between 0-8
@@ -315,6 +309,5 @@ var html = {
         new_board.pressed_col = pos % 9;
         new_board.waiting_for_num = true;
         document.getElementById(pos).style.backgroundColor = "#b2babb";
-        console.log(new_board);
     }
 }
