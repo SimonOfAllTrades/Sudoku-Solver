@@ -6,13 +6,6 @@
 // for this sudoku, 1-9 are the numbers in the squares and 0 indicates a blank
 
 
-/************************************* THINGS TO DO ******************************************/
-
-// determine how adding a number will be detected
-// determine when to stop adding numbers
-// determine a fast way to check a sudoku
-
-
 function board () {
     // determines how many unused pieces are left
     this.squares_left = 81;
@@ -139,8 +132,14 @@ function board () {
     // returns true if the row is valid and all the numbers from 1-9 appear at most once
     this.check_row = function (row) {
         var a = [];
-        for (var i = 0; i < 9; ++i) {
-            a[i] = this.board[row * 9 + i];
+        if (this.adding_starting_num) {
+            for (var i = 0; i < 9; ++i) {
+                a[i] = this.given_board[row * 9 + i];
+            }
+        } else {
+            for (var i = 0; i < 9; ++i) {
+                a[i] = this.board[row * 9 + i];
+            }
         }
         a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
@@ -156,8 +155,14 @@ function board () {
     // returns true if the col is valid and all the numbers from 1-9 appear at most once
     this.check_column = function (col) {
         var a = [];
-        for (var i = 0; i < 9; ++i) {
-            a[i] = this.board[i * 9 + col];
+        if (this.adding_starting_num) {
+            for (var i = 0; i < 9; ++i) {
+                a[i] = this.given_board[i * 9 + col];
+            }
+        } else {
+            for (var i = 0; i < 9; ++i) {
+                a[i] = this.board[i * 9 + col];
+            }
         }
         a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
@@ -173,11 +178,20 @@ function board () {
     this.check_nonet = function (nonet) {
         var start = nonet % 3 * 3 + (9 * 3 * Math.floor(nonet / 3));
         var a = [];
-        for (var i = 0, k = 0; i < 3; ++i) {
-            for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
-                a[i * 3 + k] = this.board[j];
+        if (this.adding_starting_num) {
+            for (var i = 0, k = 0; i < 3; ++i) {
+                for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
+                    a[i * 3 + k] = this.given_board[j];
+                }
+                k = 0;
             }
-            k = 0;
+        } else {
+            for (var i = 0, k = 0; i < 3; ++i) {
+                for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
+                    a[i * 3 + k] = this.board[j];
+                }
+                k = 0;
+            }
         }
         a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
@@ -256,20 +270,21 @@ document.addEventListener("keydown", function(event) {
                 if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
                     document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
+                    new_board.waiting_for_num = false;
                 }
-                new_board.waiting_for_num = false;
             } else if (event.keyCode >= 97 && event.keyCode <= 105) {
                 new_board.pressed_num = event.keyCode - 96;
                 if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
                     document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
+                    new_board.waiting_for_num = false;
                 }
-                new_board.waiting_for_num = false;
             } else if (event.keyCode == 8 || event.keyCode == 48) {
                 new_board.pressed_num = 0;
                 if (new_board.remove_starting_number(new_board.pressed_row, new_board.pressed_col)) {
                     document.getElementById(new_board.pressed_pos).innerHTML = "";
                     document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+                    new_board.waiting_for_num = false;
                 }
             }
         } else {
@@ -291,6 +306,7 @@ document.addEventListener("keydown", function(event) {
                     document.getElementById(new_board.pressed_pos).innerHTML = "";
                     document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
                 }
+                new_board.waiting_for_num = false;
             }
         }  
     }
@@ -301,7 +317,7 @@ document.addEventListener("keydown", function(event) {
 // HTML relating sections
 var html = {
     click_square: function (pos) {
-        if (!this.adding_starting_num) {
+        if (!new_board.adding_starting_num || new_board.waiting_for_num) {
             document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
         }
         new_board.pressed_pos = pos;
