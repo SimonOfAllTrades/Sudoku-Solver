@@ -258,6 +258,12 @@ document.addEventListener("keydown", function(event) {
                 document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
             }
             new_board.waiting_for_num = false;
+        } else if (event.keyCode >= 97 && event.keyCode <= 105) {
+            new_board.pressed_num = event.keyCode - 96;
+            if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+            }
+            new_board.waiting_for_num = false;
         }
     }
 });
