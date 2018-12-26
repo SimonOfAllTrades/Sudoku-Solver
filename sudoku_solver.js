@@ -46,9 +46,11 @@ function board () {
     // waiting for a number to be pressed when trying to add a number to the grid
     this.waiting_for_num = false;
 
+    this.adding_starting_num = true;
+
     this.pressed_num;
 
-    this.pressed_pos;
+    this.pressed_pos = 0;
 
     this.pressed_row;
 
@@ -130,7 +132,7 @@ function board () {
             return false;
         }
         this.board[pos] = 0;
-        --this.squares_left;
+        ++this.squares_left;
         return true;
     }
 
@@ -250,21 +252,53 @@ function selectionsort (a, len) {
 }
 
 var new_board = new board();
+
+
 document.addEventListener("keydown", function(event) {
     if (new_board.waiting_for_num) {
-        if (event.keyCode >= 49 && event.keyCode <= 57) {
-            new_board.pressed_num = event.keyCode - 48;
-            if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+        if (new_board.adding_starting_num) {
+            if (event.keyCode >= 49 && event.keyCode <= 57) {
+                new_board.pressed_num = event.keyCode - 48;
+                if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
+                }
+                new_board.waiting_for_num = false;
+            } else if (event.keyCode >= 97 && event.keyCode <= 105) {
+                new_board.pressed_num = event.keyCode - 96;
+                if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
+                }
+                new_board.waiting_for_num = false;
+            } else if (event.keyCode == 8 || event.keyCode == 48) {
+                new_board.pressed_num = 0;
+                if (new_board.remove_starting_number(new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = "";
+                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+                }
             }
-            new_board.waiting_for_num = false;
-        } else if (event.keyCode >= 97 && event.keyCode <= 105) {
-            new_board.pressed_num = event.keyCode - 96;
-            if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+        } else {
+            if (event.keyCode >= 49 && event.keyCode <= 57) {
+                new_board.pressed_num = event.keyCode - 48;
+                if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                }
+                new_board.waiting_for_num = false;
+            } else if (event.keyCode >= 97 && event.keyCode <= 105) {
+                new_board.pressed_num = event.keyCode - 96;
+                if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                }
+                new_board.waiting_for_num = false;
+            } else if (event.keyCode == 8 || event.keyCode == 48) {
+                new_board.pressed_num = 0;
+                if (new_board.remove_number(new_board.pressed_row, new_board.pressed_col)) {
+                    document.getElementById(new_board.pressed_pos).innerHTML = "";
+                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+                }
             }
-            new_board.waiting_for_num = false;
-        }
+        }  
     }
 });
 
@@ -273,10 +307,14 @@ document.addEventListener("keydown", function(event) {
 // HTML relating sections
 var html = {
     click_square: function (pos) {
+        if (!this.adding_starting_num) {
+            document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
+        }
         new_board.pressed_pos = pos;
         new_board.pressed_row = Math.floor(pos / 9);
         new_board.pressed_col = pos % 9;
         new_board.waiting_for_num = true;
-        document.getElementById(pos).backgroundColor = "grey";
+        document.getElementById(pos).style.backgroundColor = "#b2babb";
+        console.log(new_board);
     }
 }
