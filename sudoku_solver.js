@@ -97,6 +97,15 @@ function board () {
             this.board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 --this.squares_left;
+                if (this.square_left == 0) {
+                    for (var i = 0; i < 9; ++i) {
+                        if (!this.check_row(i) || !this.check_col(i) || !this.check_nonet(i)) {
+                            alert("Your sudoku was not correct");
+                            return;
+                        }
+                    }
+                    alert("You have done good");
+                }
                 return true;
             }
             this.board[pos] = 0; // invalid number
@@ -356,5 +365,7 @@ var html = {
             }
         }
     }
+
+
 }
 
