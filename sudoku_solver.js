@@ -39,7 +39,10 @@ function board () {
     // waiting for a number to be pressed when trying to add a number to the grid
     this.waiting_for_num = false;
 
-    this.adding_starting_num = true;
+    this.state = 0;
+    // 0 is adding starting numbers
+    // 1 is adding regular numbers
+    // 2 is adding note numbers
 
     this.pressed_num;
 
@@ -59,6 +62,8 @@ function board () {
         if (this.given_board[pos] == 0) { // available space in the original board
             this.given_board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
+                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
                 --this.squares_left;
                 return true;
             }
@@ -67,6 +72,8 @@ function board () {
             var temp = this.given_board[pos];
             this.given_board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
+                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
+                document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
                 return true;
             }
             this.given_board[pos] = temp;
@@ -83,6 +90,8 @@ function board () {
         }
         this.given_board[pos] = 0;
         ++this.squares_left;
+        document.getElementById(new_board.pressed_pos).innerHTML = "";
+        document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
         return true;
     }   
 
@@ -106,6 +115,7 @@ function board () {
                     }
                     alert("You have done good");
                 }
+                document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
                 return true;
             }
             this.board[pos] = 0; // invalid number
@@ -129,7 +139,20 @@ function board () {
         }
         this.board[pos] = 0;
         ++this.squares_left;
+        document.getElementById(new_board.pressed_pos).innerHTML = "";
         return true;
+    }
+
+    // method to solve board using backtracking BRUTE FORCE
+    this.solve_board_backtrack = function () {
+        var pos = 0;
+        var num = 1;
+        while (1) {
+            if (pos == 81) {
+                return (alert("Solved!"));
+            }
+            
+        }
     }
 
     // method to determine if the given_board is a solvable puzzle
@@ -141,11 +164,11 @@ function board () {
     // returns true if the row is valid and all the numbers from 1-9 appear at most once
     this.check_row = function (row) {
         var a = [];
-        if (this.adding_starting_num) {
+        if (this.state == 0) {
             for (var i = 0; i < 9; ++i) {
                 a[i] = this.given_board[row * 9 + i];
             }
-        } else {
+        } else if (this.state == 1) {
             for (var i = 0; i < 9; ++i) {
                 a[i] = this.board[row * 9 + i];
             }
@@ -164,11 +187,11 @@ function board () {
     // returns true if the col is valid and all the numbers from 1-9 appear at most once
     this.check_column = function (col) {
         var a = [];
-        if (this.adding_starting_num) {
+        if (this.state == 0) {
             for (var i = 0; i < 9; ++i) {
                 a[i] = this.given_board[i * 9 + col];
             }
-        } else {
+        } else if (this.state == 1) {
             for (var i = 0; i < 9; ++i) {
                 a[i] = this.board[i * 9 + col];
             }
@@ -187,14 +210,14 @@ function board () {
     this.check_nonet = function (nonet) {
         var start = nonet % 3 * 3 + (9 * 3 * Math.floor(nonet / 3));
         var a = [];
-        if (this.adding_starting_num) {
+        if (this.state == 0) {
             for (var i = 0, k = 0; i < 3; ++i) {
                 for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
                     a[i * 3 + k] = this.given_board[j];
                 }
                 k = 0;
             }
-        } else {
+        } else if (this.state == 1) {
             for (var i = 0, k = 0; i < 3; ++i) {
                 for (var j = start + i * 9; j < start + i * 9 + 3; ++j, ++k) {
                     a[i * 3 + k] = this.board[j];
@@ -219,6 +242,15 @@ function board () {
         }
         return false;
     }
+
+    /*this.update_squares_left () {
+        this.squares_left = 81;
+         for (var i = 0; i < 81; ++1) {
+            if (this.board[i] != 0) {
+                --this.squares_left;
+            }
+        }
+    }*/
 
     // method to find the nonet given col and row
     // returns the an integer from 1-9
@@ -250,6 +282,25 @@ function board () {
         }
     }
 
+    // method that addes the sides to the gird in the html
+    this.add_sides = function () {
+        for (var i = 0; i < 81; ++i) {
+            if (i % 3 == 0) {
+                document.getElementById(i).style.borderLeft = "2px solid black";
+            }
+            if (i % 3 == 2) {
+                document.getElementById(i).style.borderRight = "2px solid black";
+            }
+            if (Math.floor(i / 9) % 3 == 0) {
+                document.getElementById(i).style.borderTop = "2px solid black";
+            }
+            if (Math.floor(i / 9) % 3 == 2) {
+                document.getElementById(i).style.borderBottom = "2px solid black";
+            }
+        }
+    }
+
+    // method to add notes for the numbers that would be there;
 }
 
 
@@ -269,55 +320,67 @@ function selectionsort (a, len) {
 }
 
 var new_board = new board();
+new_board.add_sides();
+document.getElementById("add_start").style.backgroundColor = "#ecab44";
 
+// function to add note taking numbers into each cell
+$(document).ready (function () {
+    for (var i = 0; i < 81; ++i) {
+        for (var j = 1; j < 10; ++j) {
+            var new_id = String(i) + "-" + String(j);
+            $("<div></div>").attr("id", new_id).addClass("smallsquare").appendTo("#" + i);
+        }
+    }
+});
 
 document.addEventListener("keydown", function(event) {
     if (new_board.waiting_for_num) {
-        if (new_board.adding_starting_num) {
+        if (new_board.state == 0) {
             if (event.keyCode >= 49 && event.keyCode <= 57) {
                 new_board.pressed_num = event.keyCode - 48;
                 if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
-                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
                     new_board.waiting_for_num = false;
                 }
             } else if (event.keyCode >= 97 && event.keyCode <= 105) {
                 new_board.pressed_num = event.keyCode - 96;
                 if (new_board.add_starting_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
-                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "ccd1d1";
                     new_board.waiting_for_num = false;
                 }
             } else if (event.keyCode == 8 || event.keyCode == 48) {
                 new_board.pressed_num = 0;
                 if (new_board.remove_starting_number(new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = "";
-                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
                     new_board.waiting_for_num = false;
                 }
             }
-        } else {
+        } else if (new_board.state == 1) {
             if (event.keyCode >= 49 && event.keyCode <= 57) {
                 new_board.pressed_num = event.keyCode - 48;
                 if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
                     new_board.waiting_for_num = false;
                 }
             } else if (event.keyCode >= 97 && event.keyCode <= 105) {
                 new_board.pressed_num = event.keyCode - 96;
                 if (new_board.add_number(new_board.pressed_num, new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = new_board.pressed_num;
                     new_board.waiting_for_num = false;
                 }
             } else if (event.keyCode == 8 || event.keyCode == 48) {
                 new_board.pressed_num = 0;
                 if (new_board.remove_number(new_board.pressed_row, new_board.pressed_col)) {
-                    document.getElementById(new_board.pressed_pos).innerHTML = "";
-                    document.getElementById(new_board.pressed_pos).style.backgroundColor = "white";
                     new_board.waiting_for_num = false;
                 }
             }
-        }  
+        } else if (new_board.state == 2) {
+            if (event.keyCode >= 49 && event.keyCode <= 57) {
+                new_board.pressed_num = event.keyCode - 48;
+                document.getElementById(new_board.pressed_pos + "-" + new_board.pressed_num).innerHTML = new_board.pressed_num;
+            } else if (event.keyCode >= 97 && event.keyCode <= 105) {
+                new_board.pressed_num = event.keyCode - 96;
+                document.getElementById(new_board.pressed_pos + "-" + new_board.pressed_num).innerHTML = new_board.pressed_num;
+            } else if (event.keyCode == 8 || event.keyCode == 48) {
+                new_board.pressed_num = 0;
+                // nothing is here yet as I think about what to do to when 0 or backspace is pressed
+            }
+        } 
     }
 });
 
@@ -342,30 +405,45 @@ var html = {
     change_state: function (state) {
         if (state == 0) {
             if (confirm("Are you sure you want to erase all non-starting numbers?")) {
-                new_board.adding_starting_num = true;
-                for (var i = 0; i < 81; ++i) {
-                    if (new_board.given_board[i] == 0) {
-                        new_board.board[i] = 0;
-                        document.getElementById(i).innerHTML = "";
+                document.getElementById("add_start").style.backgroundColor = "#ecab44";
+                document.getElementById("add_reg").style.backgroundColor = "#ffc300";
+                document.getElementById("add_note").style.backgroundColor = "#ffc300";
+                new_board.state = 0;
+                for (var i = 0; i < 9; ++i) {
+                    for (var j = 0; j < 9; ++j) {
+                        if (new_board.given_board[i] == 0) {
+                            new_board.remove_number(i, j);
+                        }
                     }
                 }
                 new_board.board = new_board.given_board.slice();
             }
             return;
-        } else if (state == 1) {
-            new_board.adding_starting_num = false;
-        } else if (state == 2) {
+        } else if (state == 1) { //change to adding manual numbers
+            document.getElementById("add_reg").style.backgroundColor = "#ecab44";
+            document.getElementById("add_start").style.backgroundColor = "#ffc300";
+            document.getElementById("add_note").style.backgroundColor = "#ffc300";
+            new_board.state = 1;
+        } else if (state == 2) { // reset the board
             if (confirm("Are you sure you want to reset the entire baord?")) {
-                for (var i = 0; i < 81; ++i) {
-                    new_board.given_board[i] = 0;
-                    document.getElementById(i).innerHTML = "";
-                    document.getElementById(i).style.backgroundColor = "white";
+                new_board.pressed_pos = 0;
+                for (var i = 0; i < 9; ++i) {
+                    for (var j = 0; j < 9; ++j) {
+                        new_board.pressed_pos = i * 9 + j;
+                        new_board.remove_starting_number (i, j);
+                        document.getElementById(i * 9 + j).style.backgroundColor = "white";
+                    }
                 }
                 new_board.board = new_board.given_board.slice();
             }
+        } else if (state == 3) {
+            document.getElementById("add_note").style.backgroundColor = "#ecab44";
+            document.getElementById("add_start").style.backgroundColor = "#ffc300";
+            document.getElementById("add_reg").style.backgroundColor = "#ffc300";
+            new_board.state = 2;
         }
     }
 
-
 }
 
+// make sure the way to check if all numbers have been placesd already is to check the array directly
