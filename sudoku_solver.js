@@ -173,6 +173,7 @@ function board () {
                 a[i] = this.board[row * 9 + i];
             }
         }
+        console.log(a);
         a = selectionsort(a, 9);
         for (var i = 0; i < 8; ++i) {
             if (a[i] == a[i + 1] && a[i] != 0) { // if there is a duplicate number besides 0
@@ -424,6 +425,7 @@ var html = {
             document.getElementById("add_start").style.backgroundColor = "#ffc300";
             document.getElementById("add_note").style.backgroundColor = "#ffc300";
             new_board.state = 1;
+            new_board.board = new_board.given_board.slice();
         } else if (state == 2) { // reset the board
             if (confirm("Are you sure you want to reset the entire baord?")) {
                 new_board.pressed_pos = 0;
