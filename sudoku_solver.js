@@ -43,26 +43,23 @@ function board () {
         for (var i = 0; i < 81; ++i) {
             this.note_board[i] = [];
             for (var j = 0; j < 9; ++j) {
-                this.note_board[i][j] = j + 1;
+                this.note_board[i][j] = true;
             }
         }
     }
 
 
-
-    // may not be necessary for what we are doing
-
     // method to add num from row, col, and nonet to the internal array of note numbers
     this.add_note_number = function (num, row, col) {
         for (var i = 0; i < 9; ++i) {
-            this.note_board[row * 9 + i][num - 1] = num; // add num to row
-            this.note_board[i * 9 + col][num - 1] = num; // add num to col
+            this.note_board[row * 9 + i][num - 1] = false; // add num to row
+            this.note_board[i * 9 + col][num - 1] = false; // add num to col
         }
         var nonet = this.nonet_at(row, col);
         var start = nonet % 3 * 3 + (9 * 3 * Math.floor(nonet / 3));
         for (var i = 0; i < 3; ++i) {
-            for (var j = start + i * 9; j < 3; ++j) {
-                this.note_board[j][num - 1] = num;
+            for (var j = start + i * 9; j < start + i * 9 + 3; ++j) {
+                this.note_board[j][num - 1] = false;
             }
         }
     }
@@ -72,15 +69,15 @@ function board () {
     // method to remove num from row, col, and nonet of the internal array of note numbers
     this.remove_note_number = function (num, row, col) {
         for (var i = 0; i < 9; ++i) {
-            this.note_board[row * 9 + col][i] = 0;
-            this.note_board[row * 9 + i][num - 1] = 0; // remove num from row
-            this.note_board[i * 9 + col][num - 1] = 0; // remove num from col
+            this.note_board[row * 9 + col][i] = true;
+            this.note_board[row * 9 + i][num - 1] = true; // remove num from row
+            this.note_board[i * 9 + col][num - 1] = true; // remove num from col
         }
         var nonet = this.nonet_at(row, col);
         var start = nonet % 3 * 3 + (9 * 3 * Math.floor(nonet / 3));
         for (var i = 0; i < 3; ++i) {
-            for (var j = start + i * 9; j < 3; ++j) {
-                this.note_board[j][num - 1] = 0;
+            for (var j = start + i * 9; j < start + i * 9 + 3; ++j) {
+                this.note_board[j][num - 1] = true;
             }
         }
     }
@@ -119,6 +116,7 @@ function board () {
                     document.getElementById(new_board.pressed_pos + "-" + i).innerHTML = "";
                 }
                 --this.squares_left;
+                this.note_board[pos][num-1] = false;
                 return true;
             }
             this.given_board[pos] = 0; // invalid number
@@ -133,6 +131,8 @@ function board () {
                     document.getElementById(new_board.pressed_pos + "-" + i).style.zIndex = -1;
                     document.getElementById(new_board.pressed_pos + "-" + i).innerHTML = "";
                 }
+                this.note_board[pos][temp-1] = true;
+                this.note_board[pos][num-1] = false;
                 return true;
             }
             this.given_board[pos] = temp;
@@ -159,17 +159,19 @@ function board () {
     // row, col is between 0-8
     // returns true if a number has been added or replaced, false if there was a starting number there
     this.add_number = function (num, row, col) {
+        this.pressed_num = num;
         var pos = col + row * 9;
+        this.pressed_pos = pos;
         var nonet = this.nonet_at(row, col);
         if (this.board[pos] == 0) {
             this.board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
                 --this.squares_left;
-                document.getElementById(this.pressed_pos).childNodes[0].nodeValue = this.pressed_num;
-                document.getElementById(this.pressed_pos).style.zIndex = 1;
+                document.getElementById(pos).childNodes[0].nodeValue = num;
+                document.getElementById(pos).style.zIndex = 1;
                 for (var i = 1; i < 10; ++i) {
-                    document.getElementById(this.pressed_pos + "-" + i).style.zIndex = -1;
-                    document.getElementById(this.pressed_pos + "-" + i).innerHTML = "";
+                    document.getElementById(pos + "-" + i).style.zIndex = -1;
+                    document.getElementById(pos + "-" + i).innerHTML = "";
                 }
                 if (this.squares_left == 0) {
                     for (var i = 0; i < 9; ++i) {
@@ -180,7 +182,7 @@ function board () {
                     }
                     console.log("You have done good");
                 }
-                this.remove_note_number(num, row, col);
+                this.add_note_number(num, row, col);
                 return true;
             }
             
@@ -189,8 +191,8 @@ function board () {
             var temp = this.board[pos];
             this.board[pos] = num;
             if (this.check_row(row) && this.check_column(col) && this.check_nonet(nonet)) {
-                document.getElementById(new_board.pressed_pos).childNodes[0].nodeValue = new_board.pressed_num;
-                this.remove_note_number(num, row, col);
+                document.getElementById(pos).childNodes[0].nodeValue = num;
+                this.add_note_number(num, row, col);
                 return true;
             }
             this.board[pos] = temp;
@@ -202,13 +204,14 @@ function board () {
     // returns true if successfuly removed, fasle if there was no number there or there was a starting number
     this.remove_number = function (row, col) {
         var pos = col + row * 9;
+        var num = this.board[pos];
         if (this.board[pos] == 0 || this.given_board[pos] != 0) {
             return false;
         }
         this.board[pos] = 0;
         ++this.squares_left;
         document.getElementById(new_board.pressed_pos).childNodes[0].nodeValue = " ";
-        //this.add_note_number(num, row, col);
+        this.remove_note_number(num, row, col);
         return true;
     }
 
@@ -221,61 +224,79 @@ function board () {
     // there seems to be an issue once the algorithm runs to 15 added numbers, after that, there is a huge issue with the back tracking.
     // therefore a better ai is to be used.
     this.solve_hard_code = function () {
-        var pos = 0;
-        var num = 1;
-        var prev = [];
+        this.state = 1;
         var starting = [];
-        var moves = 0;
+        var prev = [];
+        //creates the board of initial numbers
         for (var i = 0; i < 81; ++i) {
             if (this.board[i] == 0) {
                 starting[i] = false;
             } else {
                 starting[i] = true;
             }
+            prev[i] = 0;
         }
-        var backtracking = false;
-        while (1) {
-            var row = Math.floor(pos / 9);
-            var col = pos % 9;
-            this.pressed_pos = pos;
-            this.pressed_num = num;
 
-            if (pos >= 81) {
-                console.log("This solution required: " + moves + " moves.");
+        var backtracking = false;
+        var pos = 0;
+        var row = 0;
+        var col = 0;
+        var moves = 0;
+
+        while (moves < 100) {
+            if (pos < 0) {
+                alert("Unsolvable");
                 break;
             }
-
-            if (starting[pos]) {
-                if (backtracking) {
-                    --pos;
-                    ++moves;
-                    num = prev[pos] + 1;
-                } else {
-                    prev[pos] = this.board[pos];
-                    num = 1;
-                    ++pos;
-                    ++moves;
-                }
-                continue;
-            }
-
-            backtracking = false;
-
-            if (num > 9) {
-                this.remove_number(row, col);
-                --pos;
-                backtracking = true;
-                num = prev[pos] + 1;
-            } else {
-                if (this.add_number(num, row, col)) {
-                    prev[pos] = num;
-                    ++pos;
-                    num = 1;
-                } else {
-                    ++num;
-                }
-            }
             ++moves;
+            col = pos % 9;
+            row = Math.floor(pos / 9);
+            //console.log(backtracking);
+            if (backtracking) {
+                if (this.given_board[pos] != 0) {
+                    --pos;
+                } else {
+                    ++prev[pos];
+                    if (prev[pos] < 9) {
+                        while(prev[pos] < 9) {
+                            if (this.note_board[pos][prev[pos]]) {
+                                backtracking = false;
+                                this.add_number(prev[pos]+1, row, col);
+                                ++pos;
+                                break;
+                            }
+                            ++prev[pos];
+                        }
+                    } else {
+                        this.remove_number(row, col);
+                        prev[pos] = 0;
+                        --pos;
+                    }
+                }
+            } else {
+                //don't do anything if there was a starting position number there
+                if (this.given_board[pos] != 0) {
+                    ++pos;
+                } else {
+                    //move to the previous numbers
+                    if (prev[pos] < 9) {
+                        if (prev[pos] == 0) {
+                            ++prev[pos];
+                        }
+                        while(prev[pos] < 9) {
+                            if (this.note_board[pos][prev[pos]]) {
+                                this.add_number(prev[pos]+1, row, col);
+                                ++pos;
+                                break;
+                            }
+                            ++prev[pos];
+                        }
+                    } else {
+                        backtracking = true;
+                        --pos;
+                    }
+                }
+            }
         }
     }
 
@@ -294,13 +315,153 @@ function board () {
     */
     // for this ai, I will only be using the beginner's method.  In the future, the advanced method might be used, but for now, it is just a working concept
     this.solve_board_ai = function () {
+        this.state = 1;
         var pos = 0; // position on the baord
         var num = 1; // number that we are focussing on
-        var occurance = [0, 0, 0, 0, 0, 0, 0, 0, 0] // number of occurances on the board for the number, for a number n (from 1-9), the index is n-1 (0-8)
         var changed = true;
-        while (1) {
-            
+        var notesLeftBoard = [
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0
+        ];
+        while (changed) {
+            changed = false;
+
+            /**********************************    NAKED SINGLES    *******************************************/
+
+            for (var i = 0; i < 81; ++i) {
+                var numNotes = 0;
+                var single = 0;
+                var row = Math.floor(i / 9);
+                var col = i % 9;
+                //check for singles
+                for (var j = 0; j < 9; ++j) {
+                    if (this.note_board[i][j] != 0) {
+                        ++numNotes;
+                        single = j+1;
+                    }
+                }
+                notesLeftBoard[i] = numNotes;
+
+                //only work on singles
+                if (numNotes == 1 && this.board[i] == 0) {
+                    this.add_number(single, row, col);
+                    i = -1; //to keep looking for singles until 
+                    changed = true;
+                }
+            }
+
+            /**********************************    HIDDEN SINGLES    *******************************************/
+
+            //for rows
+            for (var i = 0; i < 9; ++i) {
+                var occurance = [0, 0, 0, 0, 0, 0, 0, 0, 0] // number of occurances on the board for the number, for a number n (from 1-9), the index is n-1 (0-8)
+                for (var j = 0; j < 9; ++j) {
+                    for (var k = 0; k < 9; ++k) {
+                        if (this.note_board[i*9+j][k] && this.board[i*9+j] == 0) {
+                            ++occurance[k];
+                        } 
+                    }
+                }
+                console.log(occurance);
+                //check for singles
+                for (var j = 0; j < 9; ++j) {
+                    if (occurance[j] == 1) {
+                        for (var k = 0; k < 9; ++k) {
+                            if (this.note_board[i*9+k][j] && this.board[i*9+k] == 0) {
+                                this.add_number(j+1, i, k);
+                                changed = true;
+                            }
+                        }
+                    } else if (occurance[j] == 2) {
+
+                    }
+                }
+            }
+
+            //for columns
+            for (var i = 0; i < 9; ++i) {
+                var occurance = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+                for (var j = 0; j < 9; ++j) {
+                    for (var k = 0; k < 9; ++k) {
+                        if (this.note_board[j*9+i][k] && this.board[j*9+i] == 0) {
+                            ++occurance[k];
+                        } 
+                    }
+                }
+                console.log(occurance);
+                //check for singles
+                for (var j = 0; j < 9; ++j) {
+                    if (occurance[j] == 1) {
+                        for (var k = 0; k < 9; ++k) {
+                            if (this.note_board[k*9+i][j] && this.board[k*9+i] == 0) {
+                                this.add_number(j+1, k, i);
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /**********************************    NAKED MULTIPLES    *******************************************/
+
+            /*var firstNote;
+            for (var i = 0; i < 9; ++i) {
+                for (var j = 0; j < 9; ++j) {
+                    if (notesLeft(this.note_board[i*9+j]) == 2) {
+                        firstNote = this.note_board[i*9+j]//array of 9 true/false for valid numbers 
+                        for (var k = j + 1; k < 9; ++k) {
+                            if (arrayEqual(firstNote, this.note_board[i*9+k])) {
+                                // i == row that contains double
+                                // j == column where first occurance
+                                // k == column where second occurance
+                                //remove instances from rest of row and nonet(potentially)
+                                
+                                for (var a = 0; a < 9; ++a) {
+                                    if ((a != j) && (a != k)) {
+                                        for (var b = 0; b < 9; ++b) {
+                                            if (firstNote[b]) {
+                                                this.note_board[i*9+a][b] = false;
+                                                changed = true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //clear nonet
+                                if (this.nonet_at(i, j) == this.nonet_at(i, k)) {
+                                    var nonetPos = nonetStarting(this.nonet_at(i, j));
+                                    for (var a = 0; a < 3; ++a) {
+                                        for (var b = 0; b < 3; ++b) {
+                                            console.log(nonetPos + a*9 + b + ", " + (i*9+k));
+                                            if ((nonetPos + a*9 + b != i*9+j) && (nonetPos + a*9 + b != i*9+k)) {
+                                                for (var c = 0; c < 9; ++c) {
+                                                    if (firstNote[c]) {
+                                                        this.note_board[nonetPos + a*9+b][c] = false;
+                                                        changed = true;
+                                                    }   
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                alert();
+                                break;
+                            }
+                        } 
+                        break;
+                    }
+                }
+            }*/
+//comment
         }
+        console.log(notesLeftBoard);
     }
 
 
@@ -451,6 +612,47 @@ function board () {
     }
 
     // method to add notes for the numbers that would be there;
+}
+
+function notesLeft (a) {
+    var retVal = 0;
+    for (var i = 0; i < 9; ++i) {
+        if (a[i] != 0) {
+            ++retVal;
+        } 
+    }
+    return retVal;
+}
+
+
+function arrayEqual (a, b) {
+    for (var i = 0; i < a.length; ++i) {
+        if (a[i] != b[i]) return false;
+    }
+    return true;
+}
+
+function nonetStarting (nonet) {
+    switch (nonet) {
+        case 0:
+            return 0;
+        case 1:
+            return 3;
+        case 2:
+            return 6;
+        case 3:
+            return 27;
+        case 4:
+            return 30;
+        case 5:
+            return 33;
+        case 6:
+            return 54;
+        case 7:
+            return 57;
+        case 8:
+            return 60;
+    }
 }
 
 
